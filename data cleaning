@@ -1,0 +1,157 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from palmerpenguins import load_penguins
+
+df = load_penguins()
+
+print(df.head())
+
+print(df.info())
+
+print(df.shape)
+
+print(df.columns)
+
+print(df.isnull().sum())
+
+plt.figure(figsize=(8,5))
+sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
+plt.title("Missing Values Heatmap")
+plt.show()
+
+df = df.dropna()
+
+print(df.isnull().sum())
+
+duplicates = df.duplicated().sum()
+
+print(duplicates)
+
+df = df.drop_duplicates()
+
+print(df.describe())
+
+plt.figure(figsize=(7,5))
+sns.countplot(data=df, x='species')
+plt.title("Distribution of Penguin Species")
+plt.xlabel("Species")
+plt.ylabel("Count")
+plt.show()
+
+plt.figure(figsize=(7,5))
+sns.countplot(data=df, x='island')
+plt.title("Penguin Distribution by Island")
+plt.xlabel("Island")
+plt.ylabel("Count")
+plt.show()
+
+plt.figure(figsize=(8,5))
+sns.boxplot(data=df, x='species', y='body_mass_g')
+plt.title("Body Mass Distribution by Species")
+plt.xlabel("Species")
+plt.ylabel("Body Mass (g)")
+plt.show()
+
+plt.figure(figsize=(8,5))
+sns.violinplot(data=df, x='species', y='flipper_length_mm')
+plt.title("Flipper Length Distribution by Species")
+plt.xlabel("Species")
+plt.ylabel("Flipper Length (mm)")
+plt.show()
+
+plt.figure(figsize=(8,6))
+
+sns.scatterplot(
+    data=df,
+    x='bill_length_mm',
+    y='bill_depth_mm',
+    hue='species'
+)
+
+plt.title("Bill Length vs Bill Depth")
+plt.xlabel("Bill Length (mm)")
+plt.ylabel("Bill Depth (mm)")
+plt.show()
+
+plt.figure(figsize=(8,5))
+
+sns.countplot(
+    data=df,
+    x='island',
+    hue='species'
+)
+
+plt.title("Species Distribution Across Islands")
+plt.xlabel("Island")
+plt.ylabel("Count")
+plt.show()
+
+numeric_df = df.select_dtypes(include=np.number)
+
+plt.figure(figsize=(10,7))
+
+sns.heatmap(
+    numeric_df.corr(),
+    annot=True,
+    cmap='coolwarm'
+)
+
+plt.title("Correlation Matrix")
+plt.show()
+
+sns.pairplot(df, hue='species')
+plt.show()
+
+plt.figure(figsize=(8,5))
+sns.boxplot(x=df['body_mass_g'])
+plt.title("Outlier Detection - Body Mass")
+plt.xlabel("Body Mass (g)")
+plt.show()
+
+Q1 = df['body_mass_g'].quantile(0.25)
+Q3 = df['body_mass_g'].quantile(0.75)
+
+IQR = Q3 - Q1
+
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+df_clean = df[
+    (df['body_mass_g'] >= lower_bound) &
+    (df['body_mass_g'] <= upper_bound)
+]
+
+print(df_clean.shape)
+
+plt.figure(figsize=(8,5))
+
+sns.scatterplot(
+    data=df,
+    x='flipper_length_mm',
+    y='body_mass_g',
+    hue='species'
+)
+
+plt.title("Flipper Length vs Body Mass")
+plt.xlabel("Flipper Length (mm)")
+plt.ylabel("Body Mass (g)")
+plt.show()
+
+print("""
+1. Gentoo penguins are generally heavier.
+
+2. Adelie penguins are smaller.
+
+3. Chinstrap penguins show intermediate characteristics.
+
+4. Strong positive correlation exists between flipper length and body mass.
+
+5. Dataset contains very few missing values and no duplicate records.
+""")
+
+df_clean.to_csv("cleaned_penguins.csv", index=False)
+
+print("Cleaned dataset saved successfully!")
