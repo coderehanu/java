@@ -13,7 +13,6 @@ public class ChainReaction extends JFrame {
     int currentPlayer = 1;
     boolean gameOver = false;
 
-    // Track whether each player has played at least once
     boolean player1HasPlayed = false;
     boolean player2HasPlayed = false;
 
